@@ -2,6 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
 class RecruitmentPage:
 
     RECRUITMENT_BUTTON_LOCATOR = (By.XPATH, "//a[@href='/web/index.php/recruitment/viewRecruitmentModule']")
@@ -10,20 +11,23 @@ class RecruitmentPage:
     FIRST_NAME_FIELD_LOCATOR = (By.NAME, "firstName")
     LAST_NAME_FIELD_LOCATOR = (By.NAME, "lastName")
     EMAIL_FIELD_LOCATOR = (By.XPATH, "//div[normalize-space()='Email']//input")
-    VACANCY_DROPDOWN_LOCATOR = (By.XPATH, "//label[normalize-space()='Vacancy']/ancestor::div[contains(@class, 'oxd-input-group')]//div[contains(@class, 'oxd-select-text')]")
+    VACANCY_DROPDOWN_LOCATOR = (
+        By.XPATH,
+        "//label[normalize-space()='Vacancy']"
+        "/ancestor::div[contains(@class, 'oxd-input-group')]"
+        "//div[contains(@class, 'oxd-select-text')]"
+    )
     SAVE_BUTTON_LOCATOR = (By.XPATH, "//button[@type='submit']")
     CANDIDATE_PROFILE_HEADING_LOCATOR = (By.XPATH, "//h6[text()='Candidate Profile']")
     RESUME_FILE_INPUT_LOCATOR = (By.CSS_SELECTOR, "input[type='file']")
-    ATTACHMENT_SIZE_EXCEEDED_LOCATOR = (By.XPATH,"//*[normalize-space()='Attachment Size Exceeded']")
+    ATTACHMENT_SIZE_EXCEEDED_LOCATOR = (By.XPATH, "//*[normalize-space()='Attachment Size Exceeded']")
     SHORTLIST_BUTTON_LOCATOR = (By.XPATH, "//button[contains(., 'Shortlist')]")
     SCHEDULE_INTERVIEW_BUTTON_LOCATOR = (By.XPATH, "//button[contains(., 'Schedule Interview')]")
     SUCCESS_TOAST_LOCATOR = (By.CSS_SELECTOR, ".oxd-toast--success")
-    SEARCH_BUTTON_LOCATOR = (By.XPATH, "//button[contains(., 'Search')]")
-    SEARCH_INTERVIEWER_FIELD_LOCATOR = (By.XPATH, "//div[normalize-space()='Interviewer']//input")
+    INTERVIEWER_FIELD_LOCATOR = (By.XPATH, "//div[normalize-space()='Interviewer']//input")
     INTERVIEW_TITLE_FIELD_LOCATOR = (By.XPATH, "//div[normalize-space()='Interview Title']//input")
-    INTERVIEW_DATE_FIELD_LOCATOR = (By.CSS_SELECTOR,"input[placeholder='yyyy-dd-mm']")
+    INTERVIEW_DATE_FIELD_LOCATOR = (By.CSS_SELECTOR, "input[placeholder='yyyy-dd-mm']")
     MARK_INTERVIEW_PASSED_BUTTON_LOCATOR = (By.XPATH, "//button[contains(., 'Mark Interview Passed')]")
-
 
     def __init__(self, driver):
         self.driver = driver
@@ -118,9 +122,7 @@ class RecruitmentPage:
         )
 
         self.wait.until(
-            EC.visibility_of_element_located(
-                self.CANDIDATE_PROFILE_HEADING_LOCATOR
-            )
+            EC.visibility_of_element_located(self.CANDIDATE_PROFILE_HEADING_LOCATOR)
         )
 
     def is_schedule_interview_button_displayed(self):
@@ -129,30 +131,6 @@ class RecruitmentPage:
         )
         return schedule_interview_button.is_displayed()
 
-    def search_by_candidate_name(self, first_name, last_name):
-        full_name = f"{first_name} {last_name}"
-        candidate_name_field = self.wait.until(
-            EC.visibility_of_element_located(self.SEARCH_CANDIDATE_NAME_FIELD_LOCATOR)
-        )
-
-        candidate_name_field.send_keys(full_name)
-
-        candidate_option = self.wait.until(
-            EC.element_to_be_clickable(
-                (
-                    By.XPATH,
-                    f"//div[contains(@class, 'oxd-autocomplete-option') and normalize-space()='{full_name}']"
-                )
-            )
-        )
-
-        candidate_option.click()
-
-        search_button = self.wait.until(
-            EC.element_to_be_clickable(self.SEARCH_BUTTON_LOCATOR)
-        )
-        search_button.click()
-
     def schedule_interview(self, interview_title, interviewer, interview_date):
         schedule_interview_button = self.wait.until(
             EC.element_to_be_clickable(self.SCHEDULE_INTERVIEW_BUTTON_LOCATOR)
@@ -160,7 +138,7 @@ class RecruitmentPage:
         schedule_interview_button.click()
 
         interviewer_field = self.wait.until(
-            EC.visibility_of_element_located(self.SEARCH_INTERVIEWER_FIELD_LOCATOR)
+            EC.visibility_of_element_located(self.INTERVIEWER_FIELD_LOCATOR)
         )
         interviewer_field.send_keys(interviewer)
         interviewer_option = self.wait.until(

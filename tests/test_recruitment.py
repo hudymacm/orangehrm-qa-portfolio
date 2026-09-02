@@ -1,14 +1,16 @@
+from pathlib import Path
+
 from pages.employee_management_page import EmployeeManagementPage
 from pages.login_page import LoginPage
 from pages.recruitment_page import RecruitmentPage
-from pathlib import Path
-
-import uuid
+from tests.utils import generate_unique_name
 
 pdf_path = Path(__file__).parent.parent / "test_data" / "oversized_test_cv.pdf"
 
 
 def test_add_candidate(driver):
+    unique_name = generate_unique_name()
+
     login_page = LoginPage(driver)
     recruitment_page = RecruitmentPage(driver)
 
@@ -16,9 +18,15 @@ def test_add_candidate(driver):
     login_page.login("Admin", "admin123")
 
     recruitment_page.navigate_to_recruitment()
-    recruitment_page.create_candidate("John", "Testcandidate", "john.testcandidate@example.com", "Junior Account Assistant")
+    recruitment_page.create_candidate(
+        "John",
+        f"Candidate{unique_name}",
+        f"john.{unique_name.lower()}@example.com",
+        "Payroll Administrator"
+    )
 
     assert recruitment_page.is_candidate_profile_displayed()
+
 
 def test_add_candidate_oversized_pdf(driver):
     login_page = LoginPage(driver)
@@ -33,8 +41,10 @@ def test_add_candidate_oversized_pdf(driver):
 
     assert recruitment_page.is_attachment_size_exceeded_displayed()
 
+
 def test_shortlist_candidate(driver):
-    #occasionally fails due to demo instability
+    unique_name = generate_unique_name()
+
     login_page = LoginPage(driver)
     recruitment_page = RecruitmentPage(driver)
 
@@ -42,13 +52,20 @@ def test_shortlist_candidate(driver):
     login_page.login("Admin", "admin123")
 
     recruitment_page.navigate_to_recruitment()
-    recruitment_page.create_candidate("John", "Testcandidate3", "john.testcandidate3@example.com", "Payroll Administrator")
+    recruitment_page.create_candidate(
+        "John",
+        f"Candidate{unique_name}",
+        f"john.{unique_name.lower()}@example.com",
+        "Payroll Administrator"
+    )
     recruitment_page.shortlist_candidate()
 
     assert recruitment_page.is_schedule_interview_button_displayed()
 
+
 def test_schedule_interview(driver):
-    unique_name = f"Test{uuid.uuid4().hex[:8]}"
+    unique_name = generate_unique_name()
+    interviewer_name = f"John {unique_name}"
 
     login_page = LoginPage(driver)
     recruitment_page = RecruitmentPage(driver)
@@ -68,7 +85,6 @@ def test_schedule_interview(driver):
         "Payroll Administrator"
     )
     recruitment_page.shortlist_candidate()
-    interviewer_name = f"John {unique_name}"
     recruitment_page.schedule_interview("Entry Interview", interviewer_name, "2026-01-10")
 
     assert recruitment_page.is_mark_interview_passed_displayed()
